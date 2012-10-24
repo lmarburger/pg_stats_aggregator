@@ -12,7 +12,7 @@ Librato::Metrics.authenticate user, token
 
 include Clockwork
 counters = {}
-every 15.seconds, 'postgres_performance' do
+every 60.seconds, 'postgres_performance' do
   Sequel.connect(ENV["DATABASE_URL"]) do |db|
     PGStats.new(db, counters).submit
   end
