@@ -1,4 +1,4 @@
 source :rubygems
 gem 'clockwork'
-gem 'metriks'
-gem 'pg'
+gem 'librato-metrics'
+gem 'sequel_pg'
