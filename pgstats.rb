@@ -14,7 +14,9 @@ class PGStats
              sum(idx_scan)  AS index_scans,
              sum(n_tup_ins) AS inserts,
              sum(n_tup_upd) AS updates,
-             sum(n_tup_del) AS deletes
+             sum(n_tup_del) AS deletes,
+             (SELECT (sum(idx_blks_hit) - sum(idx_blks_read)) / sum(idx_blks_hit)
+              FROM pg_statio_user_indexes) AS cache_hit_ratio
       FROM pg_stat_user_tables;
     SQL
   end
