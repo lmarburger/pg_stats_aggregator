@@ -14,10 +14,15 @@ class PGStats
              sum(idx_scan)  AS index_scans,
              sum(n_tup_ins) AS inserts,
              sum(n_tup_upd) AS updates,
-             sum(n_tup_del) AS deletes,
-             (SELECT (sum(idx_blks_hit) - sum(idx_blks_read)) / sum(idx_blks_hit)
-              FROM pg_statio_user_indexes) AS cache_hit_ratio
+             sum(n_tup_del) AS deletes
       FROM pg_stat_user_tables;
+    SQL
+  end
+
+  def ratios
+    @db[<<-SQL].first
+      SELECT (sum(idx_blks_hit) - sum(idx_blks_read)) / sum(idx_blks_hit) AS cache_hit_ratio
+      FROM pg_statio_user_indexes AS cache_hit_ratio;
     SQL
   end
 
@@ -26,7 +31,7 @@ class PGStats
     measure_time = now_floored
 
     stats.each do |name, current_counter|
-      current_counter = current_counter.to_f
+      current_counter = current_counter.to_i
       last_counter    = @counters[name]
       if last_counter && current_counter >= last_counter
         value = current_counter - last_counter
@@ -35,6 +40,11 @@ class PGStats
       end
 
       @counters[name] = current_counter
+    end
+
+    ratios.each do |name, value|
+      queue.add("postgres.#{name}" => { :value        => value,
+                                        :measure_time => measure_time })
     end
 
     queue.submit unless queue.empty?
