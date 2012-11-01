@@ -26,7 +26,7 @@ class PGStats
     measure_time = now_floored
 
     stats.each do |name, current_counter|
-      current_counter = current_counter.to_i
+      current_counter = current_counter.to_f
       last_counter    = @counters[name]
       if last_counter && current_counter >= last_counter
         value = current_counter - last_counter
