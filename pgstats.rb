@@ -21,8 +21,8 @@ class PGStats
 
   def ratios
     @db[<<-SQL].first
-      SELECT (sum(idx_blks_hit) - sum(idx_blks_read)) / sum(idx_blks_hit) AS cache_hit_ratio
-      FROM pg_statio_user_indexes AS cache_hit_ratio;
+      SELECT sum(idx_blks_hit) / sum(idx_blks_hit + idx_blks_read) AS cache_hit_ratio
+      FROM pg_statio_user_indexes;
     SQL
   end
 
